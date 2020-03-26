@@ -33,7 +33,7 @@
 
 - How to handle TB of features?
 
-# Session 2: Efficient Model Training (Monday 3/2/2020
+# Session 2: Efficient Model Training (Monday 3/2/2020)
 
 ## Resource Elasticity in Distributed Deep Learning
 
@@ -62,7 +62,7 @@
 - Solutions: Have an accurate cost model and flexible search space. Use linear programming to minimize forward and backward cost. Constrain search to valid/acceptable solutions
 - Code: checkmateai.github.io
 
-# Keynote: Chris Re (Stanford) (Monday 3/2/2020
+# Keynote: Chris Re (Stanford) (Monday 3/2/2020)
 
 - Can we build a mathematical and systems structure for messy data streams?
 - Ex.: Triage
@@ -99,7 +99,7 @@
 - On-device inference
 - Kernel optimization: Winograd in MNN
 
-# Session 4: Model/Data Quality and Privacy (Monday 3/2/2020
+# Session 4: Model/Data Quality and Privacy (Monday 3/2/2020)
 
 ## HoloClean: Attention-based Learning for Missing Data Imputation
 
@@ -159,8 +159,105 @@
     - For weak supervision, can use correction rules (e.g. no flickering boxes in video). Then retrain model with new labels
     - Also, different sensors should agree (another assertion rule). Consistency across ID and no abrupt changes
 
-# Tuesday 3/3/2020
+# Session 5: ML Programming Models and Abstractions & ML Applied to Systems (Tuesday 3/3/2020)
 
+## AutoPhase: HLS Phase Orderings with Deep RL
 
+- How to order compiler flags? There are many possibilities with a wide range of potential complexities
 
+## Auto-Batching
+
+- Predictive Pre-compute (Facebook): predict user behavior to save resources and speed up content serving to users (e.g. dog photos)
+- Uses RNNs to model hidden states for users
+
+## Predictive Precompute with Recurrent Neural Networks
+
+## Sense & Sensitivities: Algorithmic Differentiation (Language Design for ML)
+
+## Ordering Chaos: Memory-Aware Scheduling
+
+- GPU Sharing Primitives: memory sharing in single GPU lane, for efficient job switching with dynamic scheduling
+
+# Session 6: Efficient Inference and Model Serving (Tuesday 3/3/2020)
+
+## Fine-Grained GPU Sharing Primitives for DL Applications
+
+## Improving Graph NNs with ROC
+
+- Graph sampling loses info
+- "Roc" uses no sampling (a distributed multi-GPU method)
+    - Attribute parallelism (e.g. breaking an image into quadrants)
+    - Dynamic allocation of memory to minimize data transfer between DRAM/GPU
+    - Linear regression-based graph partitioner using graph features and hardware features
+- github.com/FlexFlow/Roc
+
+## OPTIMOS
+
+- With sparse graph RNNs, load imbalances occur potentially in weight matrices
+- Skip redundant decoding computations
+- High MAC utilization
+- Custom hardware
+
+## PoET-BiN: Power Efficient Tiny Binary Neurons
+
+## Keynote: Cryptography for Safe ML (Shafi Goldwasser) (Tuesday 3/3/2020)
+
+- Ca. 1980s, 1990s: RSA encryption -> there exists c(.) functions that cannot be PAC-learned
+- Then came the Learning With Errors problem (LWE) -> homomorphic encryption
+- Geometry/lattice-based crypto resilient against quantum methods (as opposed to number theory-based crypto...)
+- Now, how to maintain privacy of both people's data and the model? How to be sure model has not been tampered with? (e.g. with malicious training data)
+- You have both a Learner (ML model) and a Verifier which communicate back and forth, and can differ in data access
+- Challenge: Adversarial ML
+    - One solution: allow "no prediction" result to deal with odd adversarial examples, to not misclassify them. But where to draw the line?
+    - Or maybe: trace unauthorized use of your data/model and verify if privacy mechanisms were used
+- And then: how do we make ML fair and interpretable to all demographics?
+- Does secrecy of random seeding matter?
+- Garbled circuits, differential privacy, etc. ...
+    - Secure multi-party computation: distributed models where parties don't have to share data with each other
+    - Fully homomorphic encryption: keep data encrypted
+    - e.g. hospital w/ secret model, and client w/ private data; can they together make a prediction/diagnosis?
+    - An approach is to use both homomorphic on some CNN layers and multi-party on others (Delphi)
+- Current work: how to mitigate error in predictions in encryption
+
+# Session 7: Quantization of Deep Neural Networks (Tuesday 3/3/2020)
+
+## Quantization for Deep NN Inference on Microcontrollers
+
+## Quantization Thresholds for Fixed-Point Inference
+
+## Riptide: Binarized NNs
+
+- Multiplication -> XNOR (w/ +1, -1)
+- Hard to simulate runtime on binary NNs
+- Riptide: fast modeling, with only two integer operations (add and right-shift). Multiplication is binarized
+
+## Winograd-aware Quantized Networks
+
+# Session 8: Efficient Model Training 2 (Tuesday 3/3/2020)
+
+## Blink: Collectives for Distributed ML
+
+- Faster collective communication protocols
+
+## Systematic Methodology for Analysis of DL
+
+- ParaDnn is their method, similar to MLPerf
+
+## MotherNets: Ensemble Learning
+
+- Combine predictions to reduce variance
+- Types
+    - Independent training: all data in all (separate) networks
+    - TreeNets: start in same nodes then branch out
+    - Snapshot Ensembles
+- MotherNets - share epochs
+    - 1) Construct MotherNet. Capture in each layer nodes with fewest parameters, put nodes into MotherNet
+    - 2) Train MotherNet
+    - 3) Hatching: function preserving transformation (i.e. transfer trained MotherNet nodes back to ensemble NNs)
+    - 4) Finally train ensemble. This is faster than Bagging, Snapshot, TreeNets
+    - Can navigate tradeoff between training time and modeling error (by number of clusters; when # is size of ensemble -> independent training)
+
+## MLPerf Training Benchmark
+
+# Workshop on Secure and Resilient Autonomy (SARA) (Wednesday 3/4/2020)
 
