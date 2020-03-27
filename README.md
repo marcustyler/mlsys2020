@@ -115,7 +115,7 @@
     - 3) Predict
 - Encoding mixed types: convert to embedded vectors
 - Attention layer
-    - Q/K are derived from atributes (query/key)
+    - Q/K are derived from attributes (query/key)
     - E.g. "County" places large weight in zip code, and smaller in city...
     - So we get attention weights
 - For prediction, convert vectors back to original value types
@@ -191,7 +191,7 @@
     - Linear regression-based graph partitioner using graph features and hardware features
 - github.com/FlexFlow/Roc
 
-## OPTIMOS
+## OPTIMUS: OPTImized matrix MUltiplication Structure for Transformer neural network accelerator
 
 - With sparse graph RNNs, load imbalances occur potentially in weight matrices
 - Skip redundant decoding computations
@@ -260,4 +260,99 @@
 ## MLPerf Training Benchmark
 
 # Workshop on Secure and Resilient Autonomy (SARA) (Wednesday 3/4/2020)
+
+## Keynote: A DARPA View
+
+- Heilmeier Catachism: What are you trying to do? What are the costs? What are the risks?
+- 47% of consumers state security/privacy as obstacles to adopting IoT devices. 18% quit using IoT for security reasons
+- Sensor challenges: Sensors deployed for long durations, with limited power, and time critical event detections, and different environments (urban, forest, bases...)
+- ISEE-3: A satellite that was once redirected to comet orbit (and became ICE-3). It vanished for several decades and they had to rebuild transceiver and signal processing capabilities in order to talk to it when it returned to Earth. The flexible nature of its radio software allowed them to reestablish communications
+    - Thus software interfaces w/ the physical world matter
+    - But it takes work to develop flexible software (DevSecOps: Development, Operations, Security)
+- 5G: Everything is connected, higher bandwidth, millions of devices / km^2
+    - Broadband -> cloud computing -> next wave of AI
+    - Environmental context -> better decisions
+    - Industry has far more money to devote to 5G development than DARPA. But DoD cares about the privacy of people, and resilient systems. DoD uses tech with lifetimes of decades, vs. 2-3 years for commercial
+    - Bit-rot: When old software stops working
+    - Now DARPA is pushing for open and transparent software, and programmable (and secure) software, which increases flxibility (OPS-5G)
+    - How to use good encryption/security w/ limited power? This issue and 5G are the current DARPA focus
+    - Open Radio Access Network (O-RAN) Alliance: Building open, standard interfaces in 5G-RAN
+    - Fully Homomorphic Encryption (FHE): Information can be processed while encrypted. Tends to be quite slow
+
+## Circuits for Entropy Generation & Secure Encryption
+
+## Feature Map Vulnerability Evaluation in CNNs
+
+- Tesla has redundant chip -> 2x power, processing etc.
+- Software-directed hardening approach
+- Feature Maps (Fmap) are robust to translational effects of inputs
+- Fmap vulnerabilities evaluation
+    - Statistical error injection: Flip bits in the NN. But mismatches are rare. So replace binary view with continuous view (cross entropy loss). Their metric: average delta cross entropy loss
+
+## Reliable Intelligence in Unreliable Environment
+
+- Noisy sensors, non-ideal conditions (rain etc.)
+- Must make current AI resilient to non-ideality
+- Fusion of multiple sensors (e.g. lidar and RGB)
+
+## Towards Information Theoretic Adversarial Examples
+
+- Perturbations on image -> misclassified
+- Carlini and Wanger's attack (minimize L2-norm)
+    - Also, Projected Gradient (PGD) attack, Deepfool attack
+- Proposed method: Mutual Information Neural Estimation (MINE)
+    - Use -I(.) and elements of C & W optimization to create natural-looking adversarial images
+    - Gaussian random projects on image -> I(x,x+delta)
+
+## Explaining Away Attacks Against Neural Networks
+
+- Gradient-based adversarial attacks
+    - Attribution for ML: What pixels motivate the decision? Use gradients to find out
+    - Integrated Gradients (Sundararajon 2017). "Explain 4" (as in MNIST) or "explain 9" shows prediction versus baseline (uniform) probability. You see which pixels were most informative for the given decision. The solution: take path integral between the input and baseline. This shows attributions
+    - Proposed variant: SHAP integrated gradients
+    - They detect adversarial attacks with 98+% accuracy
+
+## Keynote: Towards Robust and Efficient DL Systems
+
+- Adversarial attacks against DNNs, for m classes and perturbation on a datapoint
+    - Fast Gradient Sign Method (FGSM): fast but suboptimal
+    - C & W optimization
+- Consider a universal attack framework using ADMM (alternating direction method of multipliers)
+    - Structured attack demonstrates stronger attack sparsity than C & W. Therefore, they can perturb fewer pixels in ADMM attacks
+- Finally can train model with adversarial robustness and also use weight pruning (model compression)
+
+## MUTE: Multi-Hot Encoding for Neural Network Design (IBM)
+
+- For noisy, slightly out of distribution examples, misclassification is likely
+- Some classes are more semantically similar than others (e.g. "3" and "8" are similar images)
+- MUTE pushes similar classes apart (as seen in t-SNE)
+    - Specifically, use sigmoid output with multiple hot bits, instead of softmax one-hot encodings. This forces the model to learn discriminating features during backpropagation, like in error correcting codes
+    - Create an inter-class similarity matrix by training autoencoders on every class, and then running other classes through the autoencoders for all pairs
+    - Assign a larger Hamming distance to more similar classes. Number of output nodes remains the same, just a more efficient use of binary vector than with one-hot
+    - This method worked especially well with "negative" image examples
+    - arxiv.org/pdf/1910.07042.pdf
+
+## WARDEN: Deception in Data Centers
+
+- Power systems have large attack spaces, from voltage/freq controls and such
+- Power Contention: when a data center draws more power than allowed (from running a power-hungry program on power capped systems)
+- Subset of servers can be represented as multidimensional features (e.g. power consumption and storage); can we detect malicious activities?
+- Low-complexity codes for confidential data can reduce attack surface
+
+## Self-Progressing Robust Training (Chen, IBM)
+
+- Types of adversarial ML
+    - The adversarial T-shirt (wild design/colors, unable to be detected as a person)
+    - Also poisoning attack, evasion attack, model injection attacks
+- The authors plotted tradeoff between accuracy and l_inf CLEVER score (robustness of model), which are negatively correlated
+- Data augmentation with adversarial examples helps but does not fix the problem. Input transformation can be bypassed
+- Dirichlet Label Smoothing: draw labels from a distribution y_est = (1 - a)*y + a*Dirichlet(beta)
+    - Also include Gaussian Augmentation and Mixup
+    - SPROUT algorithm updates smoothing/augmentation params with each epoch
+- Customized Adversarial Training (CAT)
+    - Not all samples need be treated equally, nor all labels
+    - Improves robustness without losing accuracy
+    - Model prediction should be less confident for perturbed samples that are farther from x_i
+
+
 
