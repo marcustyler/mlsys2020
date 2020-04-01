@@ -195,6 +195,35 @@
 
 ## Sense & Sensitivities: Algorithmic Differentiation (Language Design for ML)
 
+- Overview of [Zygote](https://github.com/FluxML/Zygote.jl) differentiation tool for Julia language
+- Instead of tracing to perform reverse mode autodiff, zygote is "source to source"
+- Hooks into Julia compiler to generate source code for backward pass
+```julia
+julia> using Zygote
+
+julia> f(x) = 5x + 3
+
+julia> f(10), f'(10)
+(53, 5)
+
+julia> @code_llvm f'(10)
+define i64 @"julia_#625_38792"(i64) {
+top:
+  ret i64 5
+}
+```
+- Dynamic programming constructs like control flow, recursion, closures, structs, dictionaries are supported
+- This is great for scientific programming where we're often trying to satisfy convergence criteria and need to iterate a solution
+- If you can write a forward model for a system in Julia, you can differentiate it
+- Encode structure in ML model (e.g. conv nets based on biological structures in vision systems)
+- Dramatically speed up learning in [control problems](https://fluxml.ai/2019/03/05/dp-vs-rl.html) (vs RL)
+    - take advantage of physics models (differentiable equations)
+    - treat reward produced by RL env as a differentiable loss (model-free to model-based RL)
+- Embed NN models inside differential equations to discover unknown relationships from data
+- More info:
+    - [Flux](https://fluxml.ai/) Julia's ML toolkit
+    - [SciML](https://sciml.ai/) Open source scientific machine learning software (mostly Julia, but some tools have python and R bindings)
+    
 ## Ordering Chaos: Memory-Aware Scheduling
 
 - GPU Sharing Primitives: memory sharing in single GPU lane, for efficient job switching with dynamic scheduling
