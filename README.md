@@ -12,22 +12,31 @@
     - Approach: Successive Halving. Iteratively remove underperforming models when running all in parallel
     - Problems: Non-monotonic, non-smooth, different convergence rates for different models. Stragglers hold others back.
     - Solution: Asynchronous SHA (ASHA) to deal with stragglers - run a subset and promote when possible.
+- Impressive list of APIs to work with existing frameworks (sklearn, TF, PyTorch etc.)
+- [Web site](https://blog.ml.cmu.edu/2018/12/12/massively-parallel-hyperparameter-optimization/) and [paper](https://arxiv.org/abs/1810.05934)
 
 ## PLink: Datacenter Network Locality for Efficient Parallel Training
 
 - AllReduce algorithms fall short of optimal performance in datacenters
+    - Up to 90% of training time consumed
+    - Intra-rack latency < cross-rack latency
+    - Approach: aggregate gradients intra-rack and then only push one aggregation cross rack
 - Use locality: find clusters of VMs via network latency. Embed VMs on 2d plane and create a map
 - Use "Autotune" to detect changes in network and adjust nodes/balance the schedule
+- [Paper](https://proceedings.mlsys.org/static/paper_files/mlsys/2020/33-Paper.pdf)
 
 ## Federated Optimization
 
 - Federated training: privacy-preserving training
+- Provide theoretical convergence guarantees
 
 ## Scaling Back-Propagation (BP)
 
 - Scale BP by Parallel Scan Algorithm (BPPSA)
 - BP has strong sequential dependency
-- Blelloch Scan Algorithm
+- Blelloch Scan Algorithm O(2 log N) vs O(N)
+- Also exploit jacobian sparsity
+- Deep nets see ~2X speedup
 
 ## Distributed Hierarchical Parameter Server for Ads Systems
 
@@ -46,6 +55,8 @@
 
 ## SLIDE: Smart Algorithms for Deep Learning
 
+- Uses probabilistic hashing techniques to approach GPU speed on CPUs
+
 ## FLEET: Flexible Ensemble Training
 
 - When sharing data batches, all models in ensemble held back by slowest model
@@ -57,21 +68,31 @@
 
 - BigGAN, VideoBERT... models are exploding in size and reaching memory capacity
 - There is a training time/memory tradeoff
+- How can we train larger models than fit in GPU (or increase batch size)?
 - In training there is the Forward Pass (convolutions, pooling, etc.) and the Backward Pass (stashed activations). Rather than keeping all nodes/layers in memory, recompute them during the Backward Pass
 - Problems: Time/memory vary between layers, and nonlinear DNNs
-- Solutions: Have an accurate cost model and flexible search space. Use linear programming to minimize forward and backward cost. Constrain search to valid/acceptable solutions
+- Solutions: Have an accurate cost model and flexible search space. Use linear programming to minimize forward and backward cost and find optimal rematerialization schedule. Constrain search to valid/acceptable solutions
 - Code: checkmateai.github.io
 
-# Keynote: Chris Re (Stanford) (Monday 3/2/2020)
+# Keynote: Theory and Systems for Weak Supervision, Chris Re (Stanford) (Monday 3/2/2020)
 
+- Training data often the bottleneck in DL systems. 
+    - SOTA models are free to download and use
+    - Hardware is accessible in the cloud to rent
+    - How can we commoditize training data? 
+- Model differences are overrated and supervision is underrated (data quality more important than model choice)
 - Can we build a mathematical and systems structure for messy data streams?
 - Ex.: Triage
     - Augment chest scans
     - Label quality and quantity > model choice
     - Data augmentation is critical
 - Programmatic labels: Noisy but generates training data via weak supervision
+- Let's model the labeling process (snorkel.org)
+    - Step 1: Users write noisy labeling functions
+    - Step 2: Labeling functions are modeled to discover correlations and denoise
+- Key finding: you only need ~2X more auto-generated noisy labels to attain same performance as high-quality labels
 - Beware data artifacts such as "drains" in x-rays of chests with pneumonia, which are anti-causal (occur AFTER diagnosis). Deep learning is even better at picking up artifacts
-- Code: snorkel.org
+- Code: snorkel.org, dataintegration.ml, "Automating the art of data augmentation" blog post
 
 # Session 3: Efficient Inference and Model Serving (Monday 3/2/2020
 
@@ -80,7 +101,7 @@
 - Cycle between Modeling / Pruning/ Finetuning until ready to evaluate
 - This increases the efficiency of the model (with a tradeoff of quality)
 - Difficult to compare work in this area, with single datapoints per paper and no standard architecture. Also no standard definition of "compression ratio", or of FLOPs
-- ShrinkBench
+- [ShrinkBench](https://shrinkbench.github.io/) tool for automatically evaluating pruning techniques (PyTorch)
 
 ## SkyNet: Object Detection on Embedded Systems
 
@@ -174,6 +195,35 @@
 
 ## Sense & Sensitivities: Algorithmic Differentiation (Language Design for ML)
 
+- Overview of [Zygote](https://github.com/FluxML/Zygote.jl) differentiation tool for Julia language
+- Instead of tracing to perform reverse mode autodiff, zygote is "source to source"
+- Hooks into Julia compiler to generate source code for backward pass
+```julia
+julia> using Zygote
+
+julia> f(x) = 5x + 3
+
+julia> f(10), f'(10)
+(53, 5)
+
+julia> @code_llvm f'(10)
+define i64 @"julia_#625_38792"(i64) {
+top:
+  ret i64 5
+}
+```
+- Dynamic programming constructs like control flow, recursion, closures, structs, dictionaries are supported
+- This is great for scientific programming where we're often trying to satisfy convergence criteria and need to iterate a solution
+- If you can write a forward model for a system in Julia, you can differentiate it
+- Encode structure in ML model (e.g. conv nets based on biological structures in vision systems)
+- Dramatically speed up learning in [control problems](https://fluxml.ai/2019/03/05/dp-vs-rl.html) (vs RL)
+    - take advantage of physics models (differentiable equations)
+    - treat reward produced by RL env as a differentiable loss (model-free to model-based RL)
+- Embed NN models inside differential equations to discover unknown relationships from data
+- More info:
+    - [Flux](https://fluxml.ai/) Julia's ML toolkit
+    - [SciML](https://sciml.ai/) Open source scientific machine learning software (mostly Julia, but some tools have python and R bindings)
+    
 ## Ordering Chaos: Memory-Aware Scheduling
 
 - GPU Sharing Primitives: memory sharing in single GPU lane, for efficient job switching with dynamic scheduling
@@ -355,4 +405,35 @@
     - Model prediction should be less confident for perturbed samples that are farther from x_i
 
 
+# MLOps workshop
 
+## Holoclean
+
+See above
+
+## Overton, Chris Re (Apple/Stanford)
+
+- Internal AutoML tool at Apple for building and monitoring ML products and deployments
+- New models ruled in 2017-18, but marginal improvements from new models since then
+- Chris sees the most potential gains from automating "low-margin" jobs that he believes ML engineers shouldn't have to worry about:
+    - setting hyperparameters
+    - selecting model architecture
+    - reducing model size or compute for deployment
+- Overton uses a declarative approach to specifying goals (tell me what you want, not how to do it). Inspired by SQL etc
+    - Input schema:
+        - data payloads (data and types etc)
+        - model tasks (classification, regression, etc)
+        - input, output, and coarse grained data flow
+    - Overton then compiles schema into TF, CoreML, and/or PyTorch graphs
+        - performs model search
+        - hyperparameter search
+        - produces tagged binaries for deployment along with metadata (validation loss etc.) so that deployment can be automated
+- In production has reduced errors by 1.7 to 2.9 times
+
+## Auto Compilation of MLOps, Tianqi Chen (UWash, MXNet, XGBoost)
+
+- Apache TVM: end-to-end compiler for ML workloads
+- User specifies general computation at a high level, and target hardware
+- TVM uses AST and cost model to select best algorithm and implementation 
+- Works with newer models (transformers) and IOT edge compute hardware
+- Check out NeurIPS '18 paper: "Learning to optimize tensor programs"
