@@ -168,7 +168,7 @@
 - Also can use k-NN, semantic displacement, PIP loss, Eigenspace Overlap
 - Can use "selection task" to choose parameters for minimal EIS / downstream disagreement
 - Also on "ranking" downstream tasks
-- mleszczy@stanford.edu (works with Chris Re)
+- [Paper](https://proceedings.mlsys.org/static/paper_files/mlsys/2020/104-Paper.pdf)
 
 ## Model Assertions for Monitoring & Improving MC Models
 
@@ -353,6 +353,7 @@ top:
 - Proposed method: Mutual Information Neural Estimation (MINE)
     - Use -I(.) and elements of C & W optimization to create natural-looking adversarial images
     - Gaussian random projects on image -> I(x,x+delta)
+- [Paper](http://sara-workshop.org/assets/papers/Paper2_Info_theoretic.pdf)
 
 ## Explaining Away Attacks Against Neural Networks
 
@@ -361,6 +362,7 @@ top:
     - Integrated Gradients (Sundararajon 2017). "Explain 4" (as in MNIST) or "explain 9" shows prediction versus baseline (uniform) probability. You see which pixels were most informative for the given decision. The solution: take path integral between the input and baseline. This shows attributions
     - Proposed variant: SHAP integrated gradients
     - They detect adversarial attacks with 98+% accuracy
+- [Paper](http://sara-workshop.org/assets/papers/Paper3_Explaining%20_away_attacks.pdf)
 
 ## Keynote: Towards Robust and Efficient DL Systems
 
@@ -380,7 +382,7 @@ top:
     - Create an inter-class similarity matrix by training autoencoders on every class, and then running other classes through the autoencoders for all pairs
     - Assign a larger Hamming distance to more similar classes. Number of output nodes remains the same, just a more efficient use of binary vector than with one-hot
     - This method worked especially well with "negative" image examples
-    - arxiv.org/pdf/1910.07042.pdf
+    - [Paper](https://arxiv.org/pdf/1910.07042.pdf)
 
 ## WARDEN: Deception in Data Centers
 
